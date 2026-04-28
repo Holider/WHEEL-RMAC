@@ -223,7 +223,7 @@
     transition: border-color 0.2s;
   }
   #names-input:focus { border-color: rgba(232,66,58,0.5); }
-  #update-btn {
+  #update-btn, #update-texts-btn {
     margin-top: 8px;
     width: 100%;
     padding: 10px;
@@ -239,9 +239,36 @@
     cursor: pointer;
     transition: background 0.2s, color 0.2s;
   }
-  #update-btn:hover {
+  #update-btn:hover, #update-texts-btn:hover {
     background: var(--red);
     color: #fff;
+  }
+  .text-editor {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .text-editor label {
+    font-size: 11px;
+    color: rgba(255,255,255,0.35);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-top: 4px;
+  }
+  .text-editor input[type="text"] {
+    width: 100%;
+    background: var(--card);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 8px;
+    padding: 8px 10px;
+    color: #fff;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 13px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .text-editor input[type="text"]:focus {
+    border-color: rgba(232,66,58,0.5);
   }
 
   /* Победный оверлей */
@@ -356,8 +383,8 @@
 </div>
 
 <div class="header">
-  <h1>Колесо <span>штрафа</span></h1>
-  <p>Кто сегодня платит?</p>
+  <h1 id="main-title"><span id="title-word1">Колесо</span> <span id="title-word2" style="color:var(--red)">штрафа</span></h1>
+  <p id="main-subtitle">Кто сегодня платит?</p>
 </div>
 
 <div class="wheel-section">
@@ -385,6 +412,26 @@
       <summary>✏️ Редактировать сотрудников</summary>
       <textarea id="names-input" placeholder="Каждый сотрудник с новой строки"></textarea>
       <button id="update-btn" onclick="updateNames()">Обновить список</button>
+    </details>
+    <details style="margin-top:8px">
+      <summary>🎨 Изменить тексты</summary>
+      <div class="text-editor">
+        <label>Заголовок (первое слово)</label>
+        <input type="text" id="txt-title1" value="Колесо">
+        <label>Заголовок (красное слово)</label>
+        <input type="text" id="txt-title2" value="штрафа">
+        <label>Подзаголовок</label>
+        <input type="text" id="txt-subtitle" value="Кто сегодня платит?">
+        <label>Надпись на кнопке</label>
+        <input type="text" id="txt-btn" value="Кто же?">
+        <label>Текст над именем победителя</label>
+        <input type="text" id="txt-winner-label" value="Сегодня штраф получает">
+        <label>Текст под именем победителя</label>
+        <input type="text" id="txt-winner-sub" value="Поздравляем! 💸">
+        <label>Текст под колесом после результата</label>
+        <input type="text" id="txt-result-sub" value="Получает штраф сегодня!">
+        <button id="update-texts-btn" onclick="updateTexts()">Применить тексты</button>
+      </div>
     </details>
   </div>
 </div>
@@ -522,7 +569,7 @@ function spin() {
       const winner = getWinner(currentAngle);
       document.getElementById('result-name').style.cssText = '';
       document.getElementById('result-name').textContent = '🎯 ' + winner;
-      document.getElementById('result-sub').textContent = 'Получает штраф сегодня!';
+      document.getElementById('result-sub').textContent = window._resultSubText || 'Получает штраф сегодня!';
       resultBox.classList.add('winner');
 
       setTimeout(() => showOverlay(winner), 600);
@@ -573,6 +620,27 @@ function updateNames() {
 
 document.getElementById('names-input').value = employees.join('\n');
 drawWheel(currentAngle);
+
+function updateTexts() {
+  const t1 = document.getElementById('txt-title1').value.trim() || 'Колесо';
+  const t2 = document.getElementById('txt-title2').value.trim() || 'штрафа';
+  const sub = document.getElementById('txt-subtitle').value.trim() || '';
+  const btn = document.getElementById('txt-btn').value.trim() || '?';
+  const wLabel = document.getElementById('txt-winner-label').value.trim();
+  const wSub = document.getElementById('txt-winner-sub').value.trim();
+
+  document.getElementById('title-word1').textContent = t1 + ' ';
+  document.getElementById('title-word2').textContent = t2;
+  document.getElementById('main-subtitle').textContent = sub;
+  document.querySelector('#spin-btn .label').textContent = btn;
+  document.querySelector('.overlay-label').textContent = wLabel;
+  document.querySelector('.overlay-sub').textContent = wSub;
+
+  // Save result-sub text for next spin
+  window._resultSubText = document.getElementById('txt-result-sub').value.trim();
+}
+
+window._resultSubText = 'Получает штраф сегодня!';
 </script>
 </body>
 </html>
